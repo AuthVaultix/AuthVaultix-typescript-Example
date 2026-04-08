@@ -14,7 +14,7 @@ export class AuthvAultix {
   private secret: string;
   private version: string;
   private sessionid: string | null = null;
-  private BASE_URL = "https://api.authvaultix.com/api/1.2/";
+  private BASE_URL = "https://authvaultix.com/api/1.0/";
 
   constructor(config: AuthConfig) {
     this.name = config.name;
