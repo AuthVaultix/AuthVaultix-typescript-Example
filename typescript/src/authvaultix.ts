@@ -123,15 +123,53 @@ export class AuthvAultix {
   }
 
   private printUserInfo(info: any) {
-    console.log("\n👤 User Info:");
-    console.log(" Username:", info.username);
-    console.log(" HWID:", info.hwid);
-    console.log(" IP:", info.ip);
-    if (info.subscriptions) {
-      console.log(" Subscriptions:");
-      info.subscriptions.forEach((sub: any) =>
-        console.log(`  - ${sub.subscription} | Expires: ${sub.expiry}`)
-      );
+    console.log("\n=== User Data ===");
+
+    console.log("Username:", info.username);
+    console.log("IP:", info.ip);
+    console.log("HWID:", info.hwid);
+
+    // 🕒 Timestamp → readable date
+    const formatDate = (timestamp: string | number) => {
+      if (!timestamp) return "N/A";
+
+      const ts = Number(timestamp);
+
+      // agar already milliseconds hai toh direct use karo
+      const date = ts > 9999999999 ? new Date(ts) : new Date(ts * 1000);
+
+      return date.toLocaleString(); // local time (India)
+    };
+
+    if (info.createdate) {
+      console.log("Created:", formatDate(info.createdate));
+    }
+
+    if (info.lastlogin) {
+      console.log("Last Login:", formatDate(info.lastlogin));
+    }
+
+    // ⏳ Timeleft formatter
+    const formatTimeLeft = (seconds: number) => {
+      if (!seconds) return "0d 0h 0m";
+
+      const d = Math.floor(seconds / (3600 * 24));
+      const h = Math.floor((seconds % (3600 * 24)) / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+
+      return `${d}d ${h}h ${m}m`;
+    };
+
+    if (info.subscriptions && info.subscriptions.length > 0) {
+      console.log("\n=== Subscriptions ===");
+
+      info.subscriptions.forEach((sub: any, index: number) => {
+        console.log(`\n    Subscriptions : ${sub.subscription}`);
+        console.log(`    Expiry    : ${formatDate(sub.expiry)}`);
+        console.log(`    Time Left : ${formatTimeLeft(sub.timeleft)}`);
+      });
+    } else {
+      console.log("\nNo active subscriptions");
     }
   }
 }

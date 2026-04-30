@@ -1,5 +1,5 @@
 import readline from "readline";
-import { AuthvAultix } from "./authvaultix.js";
+import { AuthvAultix } from "./authvaultix.ts";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -8,9 +8,9 @@ const rl = readline.createInterface({
 
 
 const AuthVaultixApp = new AuthvAultix({
-  name: "Teamdeveloperxd",
-  ownerid: "5d36476ca4",
-  secret: "4e1d8a87787f8af61c5462d12ee16e1f06d53fe314c78e985571db65f0007178",
+  name: "",
+  ownerid: "",
+  secret: "",
   version: "1.0"
 });
 
