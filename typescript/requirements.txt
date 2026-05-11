@@ -1,0 +1,5 @@
+node -v
+npm -v
+npm install
+npm install typescript ts-node axios @types/node
+npx ts-node main.ts
