@@ -74,12 +74,12 @@ npm install
 Open `src/main.ts` and fill in your AuthVaultix application details:
 
 ```typescript
-const AuthVaultixApp = new AuthvAultix({
-  name: "YourAppName",       // Application name from AuthVaultix dashboard
-  ownerid: "YOUR_OWNER_ID",  // Your Owner ID
-  secret: "YOUR_SECRET",     // Your application secret
-  version: "1.0"             // Your application version
-});
+const AuthVaultixApp = new AuthVaultix(
+  "YourAppName",       // Application name from AuthVaultix dashboard
+  "YOUR_OWNER_ID",     // Your Owner ID
+  "YOUR_SECRET",       // Your application secret
+  "1.0"                // Your application version
+);
 ```
 
 > ⚠️ **Never hardcode secrets in production.** Use environment variables (e.g., `process.env.AUTHVAULTIX_SECRET`).
@@ -101,14 +101,14 @@ npm start
 ### Import & Initialize
 
 ```typescript
-import { AuthvAultix } from "./authvaultix.ts";
+import { AuthVaultix } from "./authvaultix.ts";
 
-const auth = new AuthvAultix({
-  name: "MyApp",
-  ownerid: "xxxxxxxx",
-  secret: "xxxxxxxxxxxxxxxx",
-  version: "1.0"
-});
+const auth = new AuthVaultix(
+  "MyApp",
+  "xxxxxxxx",
+  "xxxxxxxxxxxxxxxx",
+  "1.0"
+);
 
 // Must be called first before any other method
 await auth.Init();
@@ -177,25 +177,69 @@ Choose option: _
 
 ## ⚙️ API Reference
 
-### `new AuthvAultix(config: AuthConfig)`
+### `new AuthVaultix(appName: string, ownerId: string, secret: string, version: string)`
 
 | Parameter | Type | Description |
 |---|---|---|
-| `name` | `string` | Application name (from AuthVaultix dashboard) |
-| `ownerid` | `string` | Your unique Owner ID |
+| `appName` | `string` | Application name (from AuthVaultix dashboard) |
+| `ownerId` | `string` | Your unique Owner ID |
 | `secret` | `string` | Application secret key |
 | `version` | `string` | Application version string |
 
 ---
 
-### Methods
+### Authentication Methods
 
 | Method | Signature | Description |
 |---|---|---|
-| `Init()` | `async Init(): Promise<void>` | Initialize session with AuthVaultix API |
-| `Login()` | `async Login(username, password): Promise<void>` | Login with credentials + HWID |
-| `Register()` | `async Register(username, password, license): Promise<void>` | Register new user |
-| `License()` | `async License(license): Promise<void>` | License-key only authentication |
+| `Init()` | `async Init(): Promise<boolean>` | Initialize session with AuthVaultix API |
+| `Login()` | `async Login(username, password): Promise<boolean>` | Login with credentials + HWID |
+| `Register()` | `async Register(username, password, license, email?): Promise<boolean>` | Register new user |
+| `LicenseLogin()` / `License()` | `async LicenseLogin(licenseKey): Promise<boolean>` | License-key only authentication |
+| `Logout()` | `async Logout(): Promise<void>` | Terminate session |
+
+---
+
+### User & Session Management
+
+| Method | Signature | Description |
+|---|---|---|
+| `Check()` | `async Check(): Promise<boolean>` | Validates active session |
+| `Upgrade()` | `async Upgrade(username, licenseKey): Promise<boolean>` | Upgrade user account |
+| `ForgotPassword()`| `async ForgotPassword(username, email): Promise<boolean>` | Trigger password reset |
+| `ChangeUsername()`| `async ChangeUsername(newUsername): Promise<void>` | Change username |
+
+---
+
+### Data & Variables
+
+| Method | Signature | Description |
+|---|---|---|
+| `GetVar()` | `async GetVar(varName): Promise<string \| null>` | Fetch user variable |
+| `SetVar()` | `async SetVar(varName, value): Promise<boolean>` | Set user variable |
+| `GetGlobalVar()` | `async GetGlobalVar(varKey): Promise<string \| null>` | Fetch global variable |
+| `Download()` | `async Download(fileId): Promise<{success, message, fileBytes}>` | Securely download file |
+
+---
+
+### Security & Communication
+
+| Method | Signature | Description |
+|---|---|---|
+| `Log()` | `async Log(message): Promise<{success, message}>` | Send log to dashboard |
+| `FetchOnline()` | `async FetchOnline(): Promise<{success, message, users}>` | Get online clients |
+| `Ban()` | `async Ban(reason?): Promise<{success, message}>` | Ban current user |
+| `CheckBlacklist()`| `async CheckBlacklist(): Promise<{success, message}>` | Check HWID blacklist |
+| `ChatSend()` | `async ChatSend(message, channel): Promise<{success, message}>` | Send chat message |
+| `ChatFetch()` | `async ChatFetch(channel): Promise<any[] \| null>` | Retrieve chat history |
+
+---
+
+### Properties
+
+- `CurrentUser`: Object containing user info, HWID, IP, subscriptions, etc.
+- `SessionId`: Active session token.
+- `Initialized`: Boolean indicating if SDK is initialized.
 
 ---
 
@@ -207,12 +251,12 @@ Choose option: _
 
 ```typescript
 // ✅ Recommended: use environment variables
-const auth = new AuthvAultix({
-  name: process.env.APP_NAME!,
-  ownerid: process.env.OWNER_ID!,
-  secret: process.env.APP_SECRET!,
-  version: "1.0"
-});
+const auth = new AuthVaultix(
+  process.env.APP_NAME!,
+  process.env.OWNER_ID!,
+  process.env.APP_SECRET!,
+  "1.0"
+);
 ```
 
 ---
