@@ -132,6 +132,60 @@ class HardwareIdentifier {
     }
 }
 
+class SystemInfoCollector {
+    static GetOSVersion(): string {
+        try {
+            if (os.platform() === "win32") {
+                let caption = execSync('powershell -Command "(Get-CimInstance Win32_OperatingSystem).Caption"', { encoding: "utf8" }).trim();
+                if (caption.startsWith("Microsoft ")) {
+                    caption = caption.substring("Microsoft ".length);
+                }
+                return `${caption} (${os.release()})`;
+            }
+        } catch {}
+        return `${os.type()} (${os.release()})`;
+    }
+
+    static GetPlatform(): string {
+        return "native";
+    }
+
+    static GetDeviceType(): string {
+        return "Desktop";
+    }
+
+    static GetArchitecture(): string {
+        try {
+            return os.arch().toUpperCase();
+        } catch {
+            return "X64";
+        }
+    }
+
+    static GetCpuCores(): string {
+        let physicalCores = 0;
+        const logicalProcessors = os.cpus().length;
+        try {
+            if (os.platform() === "win32") {
+                const output = execSync('powershell -Command "(Get-CimInstance Win32_Processor).NumberOfCores"', { encoding: "utf8" }).trim();
+                physicalCores = parseInt(output);
+            }
+        } catch {}
+        if (!physicalCores) {
+            physicalCores = logicalProcessors;
+        }
+        return `${physicalCores} Cores / ${logicalProcessors} Threads`;
+    }
+
+    static GetRamGB(): string {
+        try {
+            return Math.round(os.totalmem() / (1024 * 1024 * 1024)).toString();
+        } catch {
+            return "0";
+        }
+    }
+}
+
 class PayloadBuilder {
     private payload: Record<string, string>;
 
@@ -243,6 +297,12 @@ class AuthVaultixCore {
             .WithValue("username", username)
             .WithValue("pass", password)
             .WithValue("hwid", HardwareIdentifier.Fetch())
+            .WithValue("os", SystemInfoCollector.GetOSVersion())
+            .WithValue("platform", SystemInfoCollector.GetPlatform())
+            .WithValue("device", SystemInfoCollector.GetDeviceType())
+            .WithValue("architecture", SystemInfoCollector.GetArchitecture())
+            .WithValue("cpu_cores", SystemInfoCollector.GetCpuCores())
+            .WithValue("ram", SystemInfoCollector.GetRamGB())
             .Compile();
 
         const resp = await NetworkAgent.Post(this._apiUrl, payload);
@@ -353,7 +413,7 @@ class AuthVaultixCore {
 
         if (!resp || !resp.success) {
             serverMessage = resp?.message || "Log failed";
-            return { success: false, message: serverMessage };
+            return { success: false, message: serverMessage || "Log failed" };
         }
         
         this.LastMessage = resp.message;

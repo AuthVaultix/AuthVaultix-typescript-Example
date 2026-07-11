@@ -1,5 +1,5 @@
 import readline from "readline";
-import { AuthVaultix } from "./authvaultix.ts";
+import { AuthVaultix } from "./authvaultix.js";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -12,7 +12,6 @@ const AuthVaultixApp = new AuthVaultix(
   "", // App Secret
   "1.0" // App version
 );
-
 (async () => {
   await AuthVaultixApp.Init();
 
