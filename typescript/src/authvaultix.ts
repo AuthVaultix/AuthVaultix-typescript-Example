@@ -297,6 +297,7 @@ class AuthVaultixCore {
             .WithValue("username", username)
             .WithValue("pass", password)
             .WithValue("hwid", HardwareIdentifier.Fetch())
+            .WithValue("version", this._version)
             .WithValue("os", SystemInfoCollector.GetOSVersion())
             .WithValue("platform", SystemInfoCollector.GetPlatform())
             .WithValue("device", SystemInfoCollector.GetDeviceType())
@@ -356,7 +357,15 @@ class AuthVaultixCore {
             .WithValue("key", licenseKey)
             .WithValue("email", email)
             .WithValue("hwid", HardwareIdentifier.Fetch())
+            .WithValue("version", this._version)
+            .WithValue("os", SystemInfoCollector.GetOSVersion())
+            .WithValue("platform", SystemInfoCollector.GetPlatform())
+            .WithValue("device", SystemInfoCollector.GetDeviceType())
+            .WithValue("architecture", SystemInfoCollector.GetArchitecture())
+            .WithValue("cpu_cores", SystemInfoCollector.GetCpuCores())
+            .WithValue("ram", SystemInfoCollector.GetRamGB())
             .Compile();
+
 
         const resp = await NetworkAgent.Post(this._apiUrl, payload);
 
@@ -379,7 +388,15 @@ class AuthVaultixCore {
             .WithContext(this._appName, this._ownerId, this.SessionId)
             .WithValue("key", licenseKey)
             .WithValue("hwid", HardwareIdentifier.Fetch())
+            .WithValue("version", this._version)
+            .WithValue("os", SystemInfoCollector.GetOSVersion())
+            .WithValue("platform", SystemInfoCollector.GetPlatform())
+            .WithValue("device", SystemInfoCollector.GetDeviceType())
+            .WithValue("architecture", SystemInfoCollector.GetArchitecture())
+            .WithValue("cpu_cores", SystemInfoCollector.GetCpuCores())
+            .WithValue("ram", SystemInfoCollector.GetRamGB())
             .Compile();
+
 
         const resp = await NetworkAgent.Post(this._apiUrl, payload);
 
